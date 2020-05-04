@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="11634795-2f04-4338-8e4b-84deed54b247" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/WebContent/Controllers/AdminControllers/appointmentController.js" beforeDir="false" afterPath="$PROJECT_DIR$/WebContent/Controllers/AdminControllers/appointmentController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebContent/Controllers/UserControllers/appointmentController.js" beforeDir="false" afterPath="$PROJECT_DIR$/WebContent/Controllers/UserControllers/appointmentController.js" afterDir="false" />
-    </list>
+    <list default="true" id="11634795-2f04-4338-8e4b-84deed54b247" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -28,7 +25,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/WebContent/Controllers/UserControllers/appointmentController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="659">
+            <state relative-caret-position="6585">
               <caret line="439" selection-start-line="439" selection-end-line="439" />
             </state>
           </provider>
@@ -124,12 +121,12 @@
       <workItem from="1586155092644" duration="23000" />
       <workItem from="1586629430670" duration="296000" />
       <workItem from="1588582229260" duration="9000" />
-      <workItem from="1588582384359" duration="538000" />
+      <workItem from="1588582384359" duration="725000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="866000" />
+    <option name="totallyTimeSpent" value="1053000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="828" extended-state="6" />
@@ -184,7 +181,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/WebContent/Controllers/UserControllers/appointmentController.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="659">
+        <state relative-caret-position="6585">
           <caret line="439" selection-start-line="439" selection-end-line="439" />
         </state>
       </provider>
