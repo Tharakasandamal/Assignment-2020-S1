@@ -14,14 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.telusko.demorest.model.AppointmentDetailsModule;
 import com.telusko.demorest.model.DoctorModel;
-import com.telusko.demorest.model.HospitalModel;
-import com.telusko.demorest.model.PaymentDetailsModel;
-import com.telusko.demorest.model.UserModel;
 import com.telusko.demorest.services.AppointmentDetailsRepository;
 import com.telusko.demorest.services.DoctorRepository;
-import com.telusko.demorest.services.HospitalRepository;
-import com.telusko.demorest.services.UserRepository;
-import com.telusko.demorest.services.paymentDetailsRepository;
 
 @Path("adminlogin")
 public class AdminController {
