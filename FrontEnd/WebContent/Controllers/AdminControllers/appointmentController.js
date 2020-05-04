@@ -84,6 +84,31 @@ $(document).ready(function() {
 
 });
 
+function addButtonClick() {
+    var select = document.getElementById("inputuserId");
+    var i, L = select.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select.remove(i);
+    }
+    Users.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["fname"] + " " + item["lname"];
+        el.value = item["fname"] + " " + item["lname"];
+        select.add(el);
+    });
+    select = document.getElementById("inputhospitalId");
+    var i, L = select.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select.remove(i);
+    }
+    Hospitals.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["name"];
+        el.value = item["name"];
+        select.add(el);
+    });
+
+}
 
 function ViewbuttonClick(para) {
     appointments4.forEach(function(item) {
@@ -94,8 +119,136 @@ function ViewbuttonClick(para) {
     setViewData();
 }
 
+function deletebuttonClick(para) {
+    $globalUrl = $rootUrl + para;
+
+}
+
+function editbuttonClick(para) {
+    appointments4.forEach(function(appointment1) {
+        if (appointment1["id"] == para) {
+            appointment = appointment1;
+        }
+    });
+    setEditViewData();
+}
+
+$(document).on("click", "#formCreateBtn", function(event) {
+    setAddData();
+    $url = $rootUrl;
+
+    $.ajax({
+        type: "POST",
+        url: $url,
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(appointment),
+        dataType: 'json',
+        success: function() {
+            alertModifier('create', 'success');
+            $('#AlertModal').modal('show');
+        },
+        error: function(jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Fail to create Appontment due to server error';
+            } else if (jqXHR.status == 404) {
+                msg = 'No Access';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alertModifier('create', msg);
+            $('#AlertModal').modal('show');
+        }
+    });
 
 
+});
+
+$(document).on("click", "#formDeleteBtn", function(event) {
+    $.ajax({
+        url: $globalUrl,
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'DELETE',
+        success: function(data) {
+            alertModifier('delete', 'success');
+            $('#AlertModal').modal('show');
+        },
+        error: function(jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Cannot delete the Record \nRelated Payment Found';
+            } else if (jqXHR.status == 404) {
+                msg = 'No Access';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alertModifier('create', msg);
+            $('#AlertModal').modal('show');
+        }
+    });
+});
+
+$(document).on("click", "#formEditBtn", function(event) {
+    setEditData();
+    $url = $rootUrl;
+    $.ajax({
+        type: "PUT",
+        url: $url,
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(appointment),
+        dataType: 'json',
+        success: function() {
+            alertModifier('update', 'success');
+            $('#AlertModal').modal('show');
+        },
+        error: function(jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Cannot update the Record';
+            } else if (jqXHR.status == 404) {
+                msg = 'No Access';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alertModifier('create', msg);
+            $('#AlertModal').modal('show');
+        }
+    });
+});
 
 $(document).on("click", "#searchBtn", function() {
     SearchAppointments = [];
@@ -169,6 +322,25 @@ function tableCreation(para) {
     }
 }
 
+function setAddData() {
+    appointment.paid = "no";
+    appointment.date = document.getElementById("inputdate").value;
+    Hospitals.forEach(function(item) {
+        if (item["name"] == document.getElementById("inputhospitalId").value) {
+            appointment.hospitalId = item["id"];
+        }
+    });
+    Users.forEach(function(item) {
+        if (item["fname"] + " " + item["lname"] == document.getElementById("inputuserId").value) {
+            appointment.userId = item["id"];
+        }
+    });
+    Doctors.forEach(function(item) {
+        if (item["fname"] + " " + item["lname"] == document.getElementById("inputdoctorId").value) {
+            appointment.doctorId = item["id"];
+        }
+    });
+}
 
 function setViewData() {
     document.getElementById("doctorId").innerHTML = appointment.doctorId;
@@ -176,6 +348,67 @@ function setViewData() {
     document.getElementById("hospitalId").innerHTML = appointment.hospitalId;
     document.getElementById("paid").innerHTML = appointment.paid;
     document.getElementById("date").innerHTML = appointment.date.replace('Z', '');
+}
+
+function setEditViewData() {
+    var select = document.getElementById("hospitalIdEdit");
+    var i, L = select.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select.remove(i);
+    }
+    Hospitals.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["name"];
+        el.value = item["name"];
+        select.add(el);
+    });
+    document.getElementById("hospitalIdEdit").value = appointment.hospitalId;
+
+    var select1 = document.getElementById("doctorIdEdit");
+    var i, L = select1.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select1.remove(i);
+    }
+    Doctors.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["fname"] + " " + item["lname"];
+        el.value = item["fname"] + " " + item["lname"];
+        select1.add(el);
+    });
+    document.getElementById("doctorIdEdit").value = appointment.doctorId;
+
+    var select2 = document.getElementById("userIdEdit");
+    var i, L = select2.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select2.remove(i);
+    }
+    Users.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["fname"] + " " + item["lname"];
+        el.value = item["fname"] + " " + item["lname"];
+        select2.add(el);
+    });
+    document.getElementById("userIdEdit").value = appointment.userId;
+    document.getElementById("dateEdit").value = appointment.date.replace('Z', '');
+}
+
+function setEditData() {
+    appointment.date = document.getElementById("dateEdit").value;
+    Hospitals.forEach(function(item) {
+        if (item["name"] == document.getElementById("hospitalIdEdit").value) {
+            appointment.hospitalId = item["id"];
+        }
+    });
+    Users.forEach(function(item) {
+        if (item["fname"] + " " + item["lname"] == document.getElementById("userIdEdit").value) {
+            appointment.userId = item["id"];
+        }
+    });
+    Doctors.forEach(function(item) {
+        if (item["fname"] + " " + item["lname"] == document.getElementById("doctorIdEdit").value) {
+            appointment.doctorId = item["id"];
+        }
+    });
 }
 
 function addDoc() {

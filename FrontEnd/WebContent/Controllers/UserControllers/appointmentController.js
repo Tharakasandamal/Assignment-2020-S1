@@ -67,6 +67,129 @@ $(document).ready(function() {
 
 
 });
+function processPayment(para){
+
+    payment = {
+        userId: $id,
+        date:new Date().toISOString().slice(0,10),
+        amount: 5000,
+        appointmentId:appointment.id,
+        paypalId:para
+
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/demorest/webapi/userlogin/payment",
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(payment),
+        dataType: 'json',
+        success: function() {
+            appointment.paid='yes';
+            $("#paypal-button-container").addClass("disabledDiv");
+            $.ajax({
+                type: "PUT",
+                url: $rootUrl,
+                headers: {
+                    "Authorization": "Basic " + btoa($username + ":" + $pw)
+                },
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(appointment),
+                dataType: 'json',
+                success: function(data) {
+                    $("#AlertPymentModal .close").click()
+                    $("#addModal .close").click();
+                    alertModifier('payment','success');
+                    $('#AlertModal').modal('show');
+                }});
+
+        },
+        error: function(jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Failed';
+            } else if (jqXHR.status == 404) {
+                msg = 'No Access';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alertModifier('payment',msg);
+            $('#AlertModal').modal('show');
+        },
+    });
+}
+function addButtonClick() {
+
+    var select = document.getElementById("inputhospitalId");
+    var i, L = select.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select.remove(i);
+    }
+    Hospitals.forEach(function(item) {
+        var el = document.createElement("option");
+        el.text = item["name"];
+        el.value = item["name"];
+        select.add(el);
+    });
+
+}
+
+
+$(document).on("click", "#formCreateBtn", function(event) {
+    setAddData();
+    $url = $rootUrl;
+
+    $.ajax({
+        type: "POST",
+        url: $url,
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(appointment),
+        dataType: 'json',
+        success: function(data) {
+            appointment=data;
+            $('#addModal').modal('toggle');
+            paymentAlertModifier('create', 'success');
+            $('#AlertPymentModal').modal('show');
+        },
+        error: function(jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Creation Failed due to server error';
+            } else if (jqXHR.status == 404) {
+                msg = 'No Access';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alertModifier('create', msg);
+            $('#AlertModal').modal('show');
+        }
+    });
+
+
+});
+
 
 function sortTable(para) {
     sortedappointments = [];
@@ -126,6 +249,23 @@ function tableCreation(para) {
     }
 }
 
+function setAddData() {
+    appointment.paid = "no";
+    appointment.date = document.getElementById("inputdate").value;
+    appointment.userId = $id;
+    Hospitals.forEach(function(item) {
+        if (item["name"] == document.getElementById("inputhospitalId").value) {
+            appointment.hospitalId = item["id"];
+        }
+    });
+
+    Doctors.forEach(function(item) {
+        if (item["fname"] + " " + item["lname"] == document.getElementById("inputdoctorId").value) {
+            appointment.doctorId = item["id"];
+        }
+    });
+}
+
 function addDoc() {
     appointments.forEach(function(appointment1) {
         var docid = appointment1["doctorId"];
@@ -148,6 +288,76 @@ function addHosptl() {
         });
         appointments3.push(appointment1);
     });
+}
+
+function docChange() {
+    removeDoctble();
+    var docname = document.getElementById("inputdoctorId").value;
+    var docId = '';
+    Doctors.forEach(function(doc) {
+        if (doc["fname"] + " " + doc["lname"] == docname) {
+            docId = doc["id"];
+        }
+    });
+
+    $.ajax({
+        url: "http://localhost:8080/demorest/webapi/userlogin/appointmentByDoc/" + docId,
+        headers: {
+            "Authorization": "Basic " + btoa($username + ":" + $pw)
+        },
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'GET',
+        success: function(data) {
+            var docAppointmnts = data;
+            var table = document.getElementById("appointmntDatetable");
+            var tbody = document.createElement("tbody");
+            table.appendChild(tbody);
+            docAppointmnts.forEach(function(item) {
+
+                var row = document.createElement("tr");
+                var cell = document.createElement("td");
+                cell.textContent = item["id"];
+                row.appendChild(cell);
+
+                var cell = document.createElement("td");
+                cell.textContent = item["date"].replace('Z', '');
+                row.appendChild(cell);
+
+                tbody.appendChild(row);
+
+            });
+        }
+    });
+}
+
+function hsptlChange() {
+    var hsptlname = document.getElementById("inputhospitalId").value;
+    var hsptlId = '';
+    Hospitals.forEach(function(item) {
+        if (item["name"] == hsptlname) {
+            hsptlId = item["id"];
+        }
+    });
+    var select = document.getElementById("inputdoctorId");
+    var i, L = select.options.length - 1;
+    for (i = L; i >= 0; i--) {
+        select.remove(i);
+    }
+    var el = document.createElement("option");
+    el.text = "";
+    el.value = "";
+    select.add(el);
+    Doctors.forEach(function(item) {
+        if (item["hospitalId"] == hsptlId) {
+            var el = document.createElement("option");
+            el.text = item["fname"] + " " + item["lname"];
+            el.value = item["fname"] + " " + item["lname"];
+            select.add(el);
+        }
+
+    });
+
 }
 
 function signOut() {
@@ -197,8 +407,8 @@ function alertModifier(para1, para2) {
                 document.getElementById('AlertMsg').innerHTML = "Record Deleted Successfully";
                 break;
             case 'payment':
-            	document.getElementById('AlertMsg2').innerHTML = "Payment Successfull";
-            	break
+                document.getElementById('AlertMsg2').innerHTML = "Payment Successfull";
+                break
         }
     } else {
         document.getElementById('alertTitle').innerHTML = "Failed";
@@ -219,7 +429,7 @@ function paymentAlertModifier(para1, para2) {
             case 'delete':
                 document.getElementById('AlertMsg2').innerHTML = "Record Deleted Successfully";
                 break;
-           
+
         }
     } else {
         document.getElementById('alertTitle2').innerHTML = "Failed";
