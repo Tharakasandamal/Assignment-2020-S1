@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Appointments Management</title>
+    <title>Doctors Management</title>
     <link rel="icon" type="image/png" href="/FrontEnd/images/icons/favicon.ico" />
     <link rel="stylesheet" href="/FrontEnd/css/material-icons.css">
     <link rel="stylesheet" href="/FrontEnd/css/font-awesome.min.css">
@@ -17,8 +17,8 @@
     <link rel="stylesheet" href="/FrontEnd/css/customStyles.css">
     <script src="/FrontEnd/js/jquery.min.js"></script>
     <script src="/FrontEnd/js/bootstrap3.3.7.min.js"></script>
-    <script src="/FrontEnd/Controllers/UserControllers/appointmentController.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AQx4zvzIj7DBk55SgQF0_JMY4ncrKIIszJ6zBlxkKyHQQ9Go3zisKtJIxfbe9NEXQsWp0n83rAGYTo9X&disable-funding=credit,card">
+    <script src="/FrontEnd/Controllers/UserControllers/doctorController.js"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=AQx4zvzIj7DBk55SgQF0_JMY4ncrKIIszJ6zBlxkKyHQQ9Go3zisKtJIxfbe9NEXQsWp0n83rAGYTo9X&disable-funding=credit,card">
         // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
     <style>
@@ -36,6 +36,7 @@
             }
         }
     </style>
+    
     <script type="text/javascript">
         $(document).ready(function() {
             // Activate tooltip
@@ -43,7 +44,7 @@
 
         });
         if (sessionStorage.getItem("userType") == null || sessionStorage.getItem("userType") == "" || sessionStorage.getItem("userType") == "admin") {
-            window.location.href = "/FrontEnd/views//login.jsp";
+            window.location.href = "/FrontEnd/views/login.jsp";
         }
     </script>
 </head>
@@ -62,10 +63,10 @@
                 </div>
             </div>
             <ul class="list-unstyled components mb-5">
-                <li class="active">
+                <li>
                     <a href="appointmentControl.jsp"><span class="fa fa-file-text-o mr-3"></span> Appointments</a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="doctorControl.jsp"><span class="fa fa-user-md mr-3"></span> Doctors</a>
                 </li>
                 <li>
@@ -85,41 +86,79 @@
         </nav>
 
         <!-- Page Content  -->
-
         <div class="container" style="padding-right: 0px;padding-left: 0px;">
             <div class="table-wrapper">
                 <div class="table-title">
                     <div class="row">
                         <div class="col-sm-6">
-                            <h2>Manage <b>Appointments</b></h2>
+                            <h2>Manage <b>Doctor details</b></h2>
                         </div>
-                        <div class="col-sm-6">
-                            <a href="#addModal" onclick='addButtonClick()' class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add Appointment</span></a>
-                        </div>
+                        
                     </div>
                 </div>
                 <div class="form-group">
-                    <input type="button" class="btn btn-default" onclick='sortTable("all")' value="All">
-                    <input type="button" class="btn btn-success" onclick='sortTable("today")' value="Today">
-                    <input type="button" class="btn btn-primary" onclick='sortTable("up")' value="Upcoming">
-                    <input type="button" class="btn btn-warning" onclick='sortTable("past")' value="Past">
+                    <input type="text" id="inputSearch" class="form-control" placeholder="First Name / Last Name">
+                    <input type="button" class="btn btn-default" id="searchBtn" value="Search">
+                    <input type="button" class="btn btn-warning" id="ResetBtn" value="Reset">
                 </div>
                 <table class="table table-striped table-hover" id="listtable">
                     <thead>
                         <tr>
-                            <th>Doctor Name</th>
-                            <th>hospital Name</th>
-                            <th>Date</th>
-                            <th>paid</th>
-                            <th></th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Specialization</th>
+                            <th>Hospital</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                 </table>
 
             </div>
         </div>
-        <!-- Add Modal HTML -->
-        <div id="addModal" class="modal fade">
+        <!-- View Modal HTML -->
+        <div id="viewModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form>
+                        <div class="modal-header">
+                            <h4 class="modal-title">View Doctor</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>First Name :</label>
+                                <span id="fname"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name :</label>
+                                <span id="lname"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>hospital :</label>
+                                <span id="hospital"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone :</label>
+                                <span id="tp"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Address :</label>
+                                <span id="addrss"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Specialization :</label>
+                                <span id="spec"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                             <a href="addAppointmentModal" onclick='addAppontmentClick()' class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add Appointment</span></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+       <!-- Add Appointmnt Modal HTML -->
+        <div id="addAppointmentModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form>
@@ -130,13 +169,11 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Hospital Name :</label>
-                                <select class="form-control" id="inputhospitalId" onchange="hsptlChange()" required>
-                                </select>
+                                 <span id="inputhospitalId"></span>
                             </div>
                             <div class="form-group">
                                 <label>Doctor Name :</label>
-                                <select class="form-control" id="inputdoctorId" onchange="docChange()" required>
-                                </select>
+                                <span id="inputdoctorId"></span>
                             </div>
                             <div class="form-group" style="text-align: center;">
                                 <label>Appointments On Doctor</label>
@@ -162,7 +199,7 @@
                 </div>
             </div>
         </div>
-        <!-- Alert Modal HTML -->
+            <!-- Alert Modal HTML -->
         <div id="AlertModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -200,8 +237,7 @@
             </div>
         </div>
     </div>
-    <script src="/FrontEnd/Shared/navbarStyles/js/popper.js"></script>
-    <script>
+        <script>
         paypal.Buttons({
             enableStandardCardFields: true,
             createOrder: function(data, actions) {
@@ -233,6 +269,7 @@
         }).render('#paypal-button-container');
         // This function displays Smart Payment Buttons on your web page.
     </script>
+    <script src="/FrontEnd/Shared/navbarStyles/js/popper.js"></script>
 </body>
 
 </html>
